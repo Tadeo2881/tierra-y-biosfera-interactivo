@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>La Tierra y la Biosfera · Actividad Interactiva</title>
+  <style>
+    :root{
+      --bg1:#0b1320;
+      --bg2:#0e3a3a;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --ok:#16a34a;
+      --bad:#dc2626;
+      --accent:#2563eb;
+      --shadow: 0 10px 25px rgba(0,0,0,.18);
+      --radius: 16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      color:#fff;
+      padding:16px;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    header{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      padding:16px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(6px);
+    }
+    header h1{
+      margin:0;
+      font-size: clamp(20px, 3vw, 28px);
+      letter-spacing:.2px;
+    }
+    header p{
+      margin:0;
+      color: rgba(255,255,255,.85);
+      line-height:1.35;
+      font-size: 14px;
+    }
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:6px;
+    }
+    .stats{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size:14px;
+      color: rgba(255,255,255,.9);
+    }
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      white-space:nowrap;
+    }
+
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius: 12px;
+      font-weight:700;
+      font-size:14px;
+      color:#fff;
+      background: var(--accent);
+      box-shadow: 0 6px 16px rgba(37,99,235,.35);
+    }
+    button.secondary{
+      background: rgba(255,255,255,.12);
+      box-shadow:none;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    button:disabled{opacity:.55; cursor:not-allowed}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+
+    @media (min-width: 900px){
+      .grid{
+        grid-template-columns: 1fr 1.2fr;
+        align-items:start;
+      }
+    }
+
+    .panel{
+      background: var(--card);
+      color: var(--text);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+
+    .panel h2{
+      margin:0 0 10px 0;
+      font-size:16px;
+      color: var(--text);
+    }
+    .hint{
+      margin:0 0 12px 0;
+      font-size:13px;
+      color: var(--muted);
+      line-height:1.35;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      min-height:64px;
+      padding:8px;
+      border-radius: 14px;
+      background: #f1f5f9;
+      border:1px dashed #cbd5e1;
+    }
+
+    .chip{
+      user-select:none;
+      padding:10px 12px;
+      border-radius: 999px;
+      background: #ffffff;
+      border:1px solid #e2e8f0;
+      box-shadow: 0 3px 10px rgba(15,23,42,.08);
+      font-weight:700;
+      font-size:14px;
+      touch-action:none;
+    }
+
+    .chip.dragging{
+      opacity:.6;
+      transform: scale(.98);
+    }
+
+    .targets{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .target{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:8px;
+      border:1px solid #e2e8f0;
+      background:#ffffff;
+      border-radius: 14px;
+      padding:12px;
+    }
+
+    @media (min-width: 520px){
+      .target{
+        grid-template-columns: 1fr 180px;
+        align-items:center;
+      }
+    }
+
+    .def{
+      font-size:14px;
+      line-height:1.35;
+      color:#0f172a;
+    }
+    .dropzone{
+      min-height:44px;
+      border-radius: 12px;
+      border: 2px dashed #cbd5e1;
+      background:#f8fafc;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px;
+      text-align:center;
+      color:#64748b;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .dropzone.filled{
+      border-style: solid;
+      border-color:#cbd5e1;
+      background:#f1f5f9;
+      color:#0f172a;
+    }
+
+    .dropzone.correct{
+      border-color: var(--ok);
+      background: rgba(22,163,74,.10);
+      color: #0f172a;
+    }
+    .dropzone.wrong{
+      border-color: var(--bad);
+      background: rgba(220,38,38,.10);
+      color: #0f172a;
+    }
+
+    .footer{
+      text-align:center;
+      font-size:12px;
+      color: rgba(255,255,255,.75);
+      padding:10px 0;
+    }
+
+    .toast{
+      margin-top:10px;
+      padding:12px;
+      border-radius: 14px;
+      background: #0f172a;
+      color:#fff;
+      display:none;
+      box-shadow: var(--shadow);
+      line-height:1.35;
+      font-size:14px;
+    }
+    .toast.show{display:block}
+    .toast strong{color:#fff}
+    .small{font-size:12px; color:#e2e8f0}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>🌍 La Tierra y la Biosfera · Actividad Interactiva</h1>
+      <p>Arrastra cada <b>concepto</b> hacia la <b>definición</b> correcta. Al final presiona <b>Calificar</b>.</p>
+
+      <div class="toolbar">
+        <div class="stats">
+          <div class="pill">Reactivos: <b id="totalItems">0</b></div>
+          <div class="pill">Colocados: <b id="placedItems">0</b></div>
+          <div class="pill">Puntaje: <b id="score">0</b> / <b id="totalScore">0</b></div>
+        </div>
+        <div class="btns">
+          <button class="secondary" id="shuffleBtn">Reiniciar / Mezclar</button>
+          <button id="gradeBtn">Calificar</button>
+        </div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+    </header>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>🧩 Conceptos</h2>
+        <p class="hint">En celular: mantén presionado y arrastra. En PC: clic y arrastra.</p>
+        <div class="chips" id="chips"></div>
+      </section>
+
+      <section class="panel">
+        <h2>📌 Definiciones (arrastra aquí)</h2>
+        <p class="hint">Cuando califiques: verde = correcto, rojo = incorrecto.</p>
+        <div class="targets" id="targets"></div>
+      </section>
+    </div>
+
+    <div class="footer">Hecho para GitHub Pages · 100% responsive</div>
+  </div>
+
+<script>
+/**
+ * ✅ EDITA AQUÍ si quieres poner EXACTAMENTE tus temas de la unidad.
+ * Solo cambia el arreglo "BANK" (concepto y definición).
+ */
+const BANK = [
+  { key:"Atmósfera", def:"Capa de gases que rodea la Tierra; regula temperatura y permite procesos climáticos." },
+  { key:"Hidrosfera", def:"Conjunto de todas las aguas del planeta (océanos, ríos, lagos, vapor y hielo)." },
+  { key:"Litosfera", def:"Capa rígida externa (corteza y parte superior del manto) donde se ubican placas tectónicas." },
+  { key:"Biosfera", def:"Zona del planeta donde existe vida e interacción entre seres vivos y su ambiente." },
+  { key:"Ecosistema", def:"Sistema formado por seres vivos (biótico) y el medio físico (abiótico) que interactúan." },
+  { key:"Biodiversidad", def:"Variedad de genes, especies y ecosistemas; clave para la estabilidad ecológica." },
+  { key:"Ciclo del agua", def:"Circulación del agua por evaporación, condensación, precipitación, infiltración y escorrentía." },
+  { key:"Ciclo del carbono", def:"Movimiento del carbono entre atmósfera, seres vivos, suelos, océanos y rocas." },
+  { key:"Cadenas tróficas", def:"Relaciones alimentarias: productores, consumidores y descomponedores (flujo de energía)." },
+  { key:"Servicios ecosistémicos", def:"Beneficios que brinda la naturaleza: agua, alimentos, regulación climática, polinización, etc." }
+];
+
+// Puedes cambiar cuántos reactivos usar (ej. 8, 10, 12)
+const NUM_ITEMS = 10;
+
+let state = {
+  items: [],
+  placements: new Map(), // targetIndex -> key
+  graded: false,
+};
+
+const chipsEl = document.getElementById("chips");
+const targetsEl = document.getElementById("targets");
+const totalItemsEl = document.getElementById("totalItems");
+const placedItemsEl = document.getElementById("placedItems");
+const scoreEl = document.getElementById("score");
+const totalScoreEl = document.getElementById("totalScore");
+const toastEl = document.getElementById("toast");
+
+document.getElementById("shuffleBtn").addEventListener("click", init);
+document.getElementById("gradeBtn").addEventListener("click", grade);
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function init(){
+  // build items
+  const bank = shuffle(BANK).slice(0, Math.min(NUM_ITEMS, BANK.length));
+  state.items = shuffle(bank);
+  state.placements = new Map();
+  state.graded = false;
+
+  render();
+  setToast("", false);
+  updateStats();
+}
+
+function render(){
+  // render chips
+  chipsEl.innerHTML = "";
+  const chipOrder = shuffle(state.items.map(x=>x.key));
+
+  chipOrder.forEach(key=>{
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.textContent = key;
+    chip.setAttribute("draggable", "true");
+    chip.dataset.key = key;
+
+    chip.addEventListener("dragstart", (e)=>{
+      chip.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", key);
+    });
+    chip.addEventListener("dragend", ()=>{
+      chip.classList.remove("dragging");
+    });
+
+    // Touch fallback: pointer events
+    enablePointerDrag(chip);
+
+    chipsEl.appendChild(chip);
+  });
+
+  // render targets
+  targetsEl.innerHTML = "";
+  const defs = shuffle(state.items); // randomize definitions order
+
+  defs.forEach((item, idx)=>{
+    const row = document.createElement("div");
+    row.className = "target";
+
+    const def = document.createElement("div");
+    def.className = "def";
+    def.innerHTML = `<b>Definición ${idx+1}:</b> ${escapeHtml(item.def)}`;
+
+    const zone = document.createElement("div");
+    zone.className = "dropzone";
+    zone.dataset.correct = item.key;
+    zone.dataset.index = idx;
+    zone.textContent = "Suelta aquí";
+
+    zone.addEventListener("dragover", (e)=> e.preventDefault());
+    zone.addEventListener("drop", (e)=>{
+      e.preventDefault();
+      const key = e.dataTransfer.getData("text/plain");
+      place(idx, key);
+    });
+
+    row.appendChild(def);
+    row.appendChild(zone);
+    targetsEl.appendChild(row);
+  });
+
+  // after rerender: restore placements (if any)
+  state.placements.forEach((key, idx)=>{
+    const zone = targetsEl.querySelector(`.dropzone[data-index="${idx}"]`);
+    if(zone){
+      zone.textContent = key;
+      zone.classList.add("filled");
+    }
+  });
+}
+
+function place(targetIndex, key){
+  if(state.graded) return;
+
+  // if this key already placed elsewhere, remove from previous
+  for(const [idx, placedKey] of state.placements.entries()){
+    if(placedKey === key){
+      state.placements.delete(idx);
+      const oldZone = targetsEl.querySelector(`.dropzone[data-index="${idx}"]`);
+      if(oldZone){
+        oldZone.textContent = "Suelta aquí";
+        oldZone.classList.remove("filled","correct","wrong");
+      }
+      break;
+    }
+  }
+
+  state.placements.set(targetIndex, key);
+
+  const zone = targetsEl.querySelector(`.dropzone[data-index="${targetIndex}"]`);
+  if(zone){
+    zone.textContent = key;
+    zone.classList.add("filled");
+    zone.classList.remove("correct","wrong");
+  }
+  updateStats();
+}
+
+function grade(){
+  if(state.graded) return;
+
+  const total = state.items.length;
+  let correct = 0;
+
+  const zones = targetsEl.querySelectorAll(".dropzone");
+  zones.forEach(zone=>{
+    const idx = Number(zone.dataset.index);
+    const expected = zone.dataset.correct;
+    const placed = state.placements.get(idx);
+
+    zone.classList.remove("correct","wrong");
+
+    if(placed && placed === expected){
+      zone.classList.add("correct");
+      correct++;
+    }else{
+      zone.classList.add("wrong");
+      // Muestra pista breve para aprendizaje (sin dar toda la respuesta)
+      if(!placed) zone.textContent = "Sin respuesta";
+    }
+  });
+
+  state.graded = true;
+  const msg = buildFeedback(correct, total);
+  setToast(msg, true);
+
+  scoreEl.textContent = correct;
+  totalScoreEl.textContent = total;
+}
+
+function buildFeedback(correct,total){
+  const pct = Math.round((correct/total)*100);
+  let nivel = "Sigue estudiando 💪";
+  if(pct >= 90) nivel = "Excelente dominio 👏";
+  else if(pct >= 70) nivel = "Buen trabajo ✅";
+  else if(pct >= 50) nivel = "Vas avanzando ⚠️";
+
+  return `<strong>Resultado:</strong> ${correct} / ${total} (${pct}%).<br>${nivel}<br><span class="small">Tip: presiona “Reiniciar / Mezclar” para intentar otra vez con orden diferente.</span>`;
+}
+
+function updateStats(){
+  totalItemsEl.textContent = state.items.length;
+  placedItemsEl.textContent = state.placements.size;
+  scoreEl.textContent = 0;
+  totalScoreEl.textContent = state.items.length;
+}
+
+function setToast(html, show){
+  toastEl.innerHTML = html || "";
+  toastEl.classList.toggle("show", !!show);
+}
+
+// ---- Helpers ----
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/**
+ * Pointer drag for mobile (simple, no librerías)
+ * - Mantener presionado el chip, se "pega" al dedo, al soltar revisa dropzones.
+ */
+function enablePointerDrag(chip){
+  let ghost = null;
+
+  chip.addEventListener("pointerdown", (e)=>{
+    if(state.graded) return;
+    chip.setPointerCapture(e.pointerId);
+
+    ghost = chip.cloneNode(true);
+    ghost.style.position="fixed";
+    ghost.style.left = (e.clientX - 40) + "px";
+    ghost.style.top  = (e.clientY - 18) + "px";
+    ghost.style.zIndex = 9999;
+    ghost.style.opacity = .9;
+    ghost.style.transform = "scale(1.02)";
+    ghost.style.pointerEvents = "none";
+    document.body.appendChild(ghost);
+  });
+
+  chip.addEventListener("pointermove", (e)=>{
+    if(!ghost) return;
+    ghost.style.left = (e.clientX - 40) + "px";
+    ghost.style.top  = (e.clientY - 18) + "px";
+  });
+
+  chip.addEventListener("pointerup", (e)=>{
+    if(!ghost) return;
+
+    // detect dropzone under pointer
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const zone = el?.closest?.(".dropzone");
+    if(zone){
+      place(Number(zone.dataset.index), chip.dataset.key);
+    }
+
+    ghost.remove();
+    ghost = null;
+  });
+}
+
+init();
+</script>
+</body>
+</html>
